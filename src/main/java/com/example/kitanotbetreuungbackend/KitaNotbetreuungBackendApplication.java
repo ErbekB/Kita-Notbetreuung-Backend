@@ -8,6 +8,7 @@ public class KitaNotbetreuungBackendApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(KitaNotbetreuungBackendApplication.class, args);
+        System.out.println("Hallo Push");
     }
 
 }
