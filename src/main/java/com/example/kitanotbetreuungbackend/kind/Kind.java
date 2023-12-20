@@ -13,9 +13,12 @@ public class Kind {
     private String vorname;
     private String nachname;
     @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
     @JsonIgnore
+    @JoinColumn(name = "kitagruppe_id")
     private KitaGruppe kitaGruppe;
     private int counter;
     private boolean teilnahmeNotbetreuung;

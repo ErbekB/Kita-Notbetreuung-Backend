@@ -3,13 +3,14 @@ package com.example.kitanotbetreuungbackend.user;
 import com.example.kitanotbetreuungbackend.kind.Kind;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class IndexDTO {
     private boolean isAdmin;
     private boolean isNotbetreuung;
-    private ArrayList<Kind> kinder;
+    private List<Kind> kinder;
 
-    public IndexDTO(boolean isAdmin, boolean isNotbetreuung, ArrayList<Kind> kinder) {
+    public IndexDTO(boolean isAdmin, boolean isNotbetreuung, List<Kind> kinder) {
         this.isAdmin = isAdmin;
         this.isNotbetreuung = isNotbetreuung;
         this.kinder = kinder;
@@ -24,7 +25,7 @@ public class IndexDTO {
         return isNotbetreuung;
     }
 
-    public ArrayList<Kind> getKindList() {
+    public List<Kind> getKindList() {
         return kinder;
     }
 

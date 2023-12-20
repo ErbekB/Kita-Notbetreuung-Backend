@@ -4,13 +4,11 @@ import com.example.kitanotbetreuungbackend.kind.Kind;
 import com.example.kitanotbetreuungbackend.kita.KitaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -26,22 +24,22 @@ public class UserController {
 
 
     @GetMapping("/index/{id}")
-    public IndexDTO hauptseite (@RequestParam long id) {
+    public IndexDTO hauptseite (@PathVariable long id) {
 
         if (userRepository.existsById(id)) {
             User Benutzer = userRepository.findById(id).get();
             boolean Admin = Benutzer.isAdmin();
             boolean Notbetreuung = Benutzer.getKita().isNotbetreuung();
-            ArrayList<Kind> kinderListe = Benutzer.getKind().get(1).getKitaGruppe().getKinder(); //TODO: Zurzeit wird nur das erste Kind ausgewählt.
+            List<Kind> kinderListe = Benutzer.getKind().get(0).getKitaGruppe().getKinder(); //TODO: Zurzeit wird nur das erste Kind ausgewählt.
 
             return new IndexDTO(Admin, Notbetreuung, kinderListe);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden");
     }
 
-    @PostMapping("/index/{id}")
-    public StatusDTO statusNotbetreuung(@RequestParam long id){
-        return new StatusDTO();
+    @PostMapping("/index")
+    public List<User> statusNotbetreuung(){
+        return userRepository.findAll();
     }
 
 

@@ -3,7 +3,7 @@ package com.example.kitanotbetreuungbackend.kitaGruppe;
 import com.example.kitanotbetreuungbackend.kind.Kind;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class KitaGruppe {
@@ -11,13 +11,13 @@ public class KitaGruppe {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @OneToMany
-    private ArrayList<Kind> kinder;
+    @OneToMany(mappedBy = "kitaGruppe", cascade = CascadeType.ALL)
+    private List<Kind> kinder;
 
     public KitaGruppe() {
     }
 
-    public KitaGruppe(String name, ArrayList<Kind> kinder) {
+    public KitaGruppe(String name, List<Kind> kinder) {
         this.name = name;
         this.kinder = kinder;
     }
@@ -38,11 +38,11 @@ public class KitaGruppe {
         this.name = name;
     }
 
-    public ArrayList<Kind> getKinder() {
+    public List<Kind> getKinder() {
         return kinder;
     }
 
-    public void setKinder(ArrayList<Kind> kind) {
+    public void setKinder(List<Kind> kind) {
         this.kinder = kind;
     }
 }

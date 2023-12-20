@@ -5,6 +5,7 @@ import com.example.kitanotbetreuungbackend.kita.Kita;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class User {
@@ -13,8 +14,8 @@ public class User {
     private Long id;
     private String name;
     private boolean isAdmin;
-    @OneToMany
-    private ArrayList<Kind> kind;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Kind> kind;
     @ManyToOne
     private Kita kita;
     private String passwort;
@@ -23,7 +24,7 @@ public class User {
     public User() {
     }
 
-    public User(ArrayList<Kind> kind, String name, Kita kita, String passwort) {
+    public User(List<Kind> kind, String name, Kita kita, String passwort) {
         this.kind = kind;
         this.name = name;
         this.kita = kita;
@@ -55,12 +56,16 @@ public class User {
         isAdmin = admin;
     }
 
-    public ArrayList<Kind> getKind() {
+    public List<Kind> getKind() {
         return kind;
     }
 
-    public void setKind(ArrayList<Kind> kind) {
+    public void setKind(List<Kind> kind) {
         this.kind = kind;
+    }
+
+    public void addKind(Kind kind) {
+        this.kind.add(kind);
     }
 
     public String getPasswort() {
