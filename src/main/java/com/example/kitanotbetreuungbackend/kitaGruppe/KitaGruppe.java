@@ -1,18 +1,25 @@
 package com.example.kitanotbetreuungbackend.kitaGruppe;
 
 import com.example.kitanotbetreuungbackend.kind.Kind;
+import com.example.kitanotbetreuungbackend.kita.Kita;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class KitaGruppe {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "kita_id")
+    private Kita kita;
     @OneToMany(mappedBy = "kitaGruppe", cascade = CascadeType.ALL)
-    private List<Kind> kinder;
+    private List<Kind> kinder = new ArrayList<>();
 
     public KitaGruppe() {
     }
@@ -36,6 +43,14 @@ public class KitaGruppe {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Kita getKita() {
+        return kita;
+    }
+
+    public void setKita(Kita kita) {
+        this.kita = kita;
     }
 
     public List<Kind> getKinder() {

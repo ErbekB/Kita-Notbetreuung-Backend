@@ -3,28 +3,27 @@ package com.example.kitanotbetreuungbackend.kita;
 import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppe;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 @Entity
 public class Kita {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @OneToMany
-    private List<KitaGruppe> kitaGruppen;
     private boolean isNotbetreuung;
+    @OneToMany(mappedBy = "kita", cascade = CascadeType.ALL)
+    private List<KitaGruppe> kitaGruppen = new ArrayList<>();
 
+    public Kita() {
+    }
 
     public Kita(String name, List<KitaGruppe> kitaGruppen) {
         this.name = name;
         this.kitaGruppen = kitaGruppen;
         this.isNotbetreuung = false;
-    }
-
-    public Kita() {
-
     }
 
     public void setId(Long id) {
