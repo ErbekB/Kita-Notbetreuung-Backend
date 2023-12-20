@@ -13,13 +13,13 @@ public class Kita {
     private Long id;
     private String name;
     @OneToMany
-    private List<KitaGruppe> kitaGruppe;
+    private List<KitaGruppe> kitaGruppen;
     private boolean isNotbetreuung;
 
 
-    public Kita(String name, List<KitaGruppe> kitaGruppe) {
+    public Kita(String name, List<KitaGruppe> kitaGruppen) {
         this.name = name;
-        this.kitaGruppe = kitaGruppe;
+        this.kitaGruppen = kitaGruppen;
         this.isNotbetreuung = false;
     }
 
@@ -43,12 +43,12 @@ public class Kita {
         this.name = name;
     }
 
-    public List<KitaGruppe> getKitaGruppe() {
-        return kitaGruppe;
+    public List<KitaGruppe> getKitaGruppen() {
+        return kitaGruppen;
     }
 
-    public void setKitaGruppe(List<KitaGruppe> kitaGruppe) {
-        this.kitaGruppe = kitaGruppe;
+    public void setKitaGruppen(List<KitaGruppe> kitaGruppe) {
+        this.kitaGruppen = kitaGruppe;
     }
 
     public boolean isNotbetreuung() {
