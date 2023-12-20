@@ -12,14 +12,14 @@ public class KitaGruppe {
     private Long id;
     private String name;
     @OneToMany
-    private ArrayList<Kind> kind;
+    private ArrayList<Kind> kinder;
 
     public KitaGruppe() {
     }
 
-    public KitaGruppe(String name, ArrayList<Kind> kind) {
+    public KitaGruppe(String name, ArrayList<Kind> kinder) {
         this.name = name;
-        this.kind = kind;
+        this.kinder = kinder;
     }
 
     public void setId(Long id) {
@@ -38,11 +38,11 @@ public class KitaGruppe {
         this.name = name;
     }
 
-    public ArrayList<Kind> getKind() {
-        return kind;
+    public ArrayList<Kind> getKinder() {
+        return kinder;
     }
 
-    public void setKind(ArrayList<Kind> kind) {
-        this.kind = kind;
+    public void setKinder(ArrayList<Kind> kind) {
+        this.kinder = kind;
     }
 }
