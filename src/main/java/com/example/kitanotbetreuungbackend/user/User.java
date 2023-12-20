@@ -10,16 +10,15 @@ import java.util.List;
 @Entity
 public class User {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String passwort;
     private boolean isAdmin;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Kind> kind;
+    private List<Kind> kind = new ArrayList<>();
     @ManyToOne
     private Kita kita;
-    private String passwort;
-
 
     public User() {
     }
@@ -29,7 +28,7 @@ public class User {
         this.name = name;
         this.kita = kita;
         this.passwort = passwort;
-        this.isAdmin= false;
+        this.isAdmin = false;
     }
 
     public void setId(Long id) {
