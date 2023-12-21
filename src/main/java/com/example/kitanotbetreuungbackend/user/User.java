@@ -18,6 +18,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Kind> kind = new ArrayList<>();
     @ManyToOne
+    @JoinColumn(name = "kita_id")
     private Kita kita;
 
     public User() {
