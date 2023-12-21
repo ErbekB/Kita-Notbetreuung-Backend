@@ -18,9 +18,7 @@ public class Kita {
     private boolean isNotbetreuung;
     @OneToMany(mappedBy = "kita", cascade = CascadeType.ALL)
     private List<KitaGruppe> kitaGruppen = new ArrayList<>();
-    @OneToMany(mappedBy = "kita", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<User> user = new ArrayList<>();
+
 
     public Kita() {
     }
@@ -61,14 +59,6 @@ public class Kita {
 
     public void setNotbetreuung(boolean notbetreuung) {
         isNotbetreuung = notbetreuung;
-    }
-
-    public List<User> getUser() {
-        return user;
-    }
-
-    public void setUser(List<User> user) {
-        this.user = user;
     }
 }
 

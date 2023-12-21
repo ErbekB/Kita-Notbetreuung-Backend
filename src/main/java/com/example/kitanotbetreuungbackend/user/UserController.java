@@ -45,7 +45,7 @@ public class UserController {
         if (userRepository.existsById(id)) {
             User Benutzer = userRepository.findById(id).get();
             if(Benutzer.isAdmin()) {
-                Benutzer.getKita().setNotbetreuung(true);
+                Benutzer.getKita().setNotbetreuung(!Benutzer.getKita().isNotbetreuung());
                 userRepository.save(Benutzer);
                 return Benutzer.getKita();
             }
