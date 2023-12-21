@@ -1,9 +1,11 @@
 package com.example.kitanotbetreuungbackend.user;
 
 import com.example.kitanotbetreuungbackend.kind.Kind;
+import com.example.kitanotbetreuungbackend.kita.Kita;
 import com.example.kitanotbetreuungbackend.kita.KitaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -37,11 +39,17 @@ public class UserController {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden");
     }
 
-    @PostMapping("/index")
-    public List<User> statusNotbetreuung(){
-        return userRepository.findAll();
+    @PostMapping("/index/{id}")
+    public Kita statusNotbetreuung(@PathVariable long id){
+
+        if (userRepository.existsById(id)) {
+            User Benutzer = userRepository.findById(id).get();
+            if(Benutzer.isAdmin()) {
+                Benutzer.getKita().setNotbetreuung(!Benutzer.getKita().isNotbetreuung());
+                userRepository.save(Benutzer);
+                return Benutzer.getKita();
+            }
+        }
+        return null;
     }
-
-
-
 }

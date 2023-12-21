@@ -1,6 +1,8 @@
 package com.example.kitanotbetreuungbackend.kita;
 
 import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppe;
+import com.example.kitanotbetreuungbackend.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ public class Kita {
     private boolean isNotbetreuung;
     @OneToMany(mappedBy = "kita", cascade = CascadeType.ALL)
     private List<KitaGruppe> kitaGruppen = new ArrayList<>();
+
 
     public Kita() {
     }
