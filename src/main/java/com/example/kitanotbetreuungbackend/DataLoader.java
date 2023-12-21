@@ -61,5 +61,8 @@ public class DataLoader implements ApplicationRunner {
         User admin = new User(new ArrayList<>(), "admin", kita, "12345");
         admin.setAdmin(true);
         userRepository.save(admin);
+
+        Kind kind = new Kind("Bahadir", "Erbek", admin , kitaGruppe);
+        kindRepository.save(kind);
     }
 }
