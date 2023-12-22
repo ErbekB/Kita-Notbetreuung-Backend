@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -35,8 +36,14 @@ public class KindController {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden");
     }
 
-    @PostMapping("/notfall/{id}")
-    public StatusKindDTO bearbeitung(@RequestParam long id) {
-        return new StatusKindDTO();
+    @PostMapping("/notfall/{kindId}")
+    public StatusKindDTO bearbeitung(@PathVariable long kindId) {
+        if (userRepository.existsById(kindId)){
+            Kind kind= kindRepository.findById(kindId).get();
+            kind.setTeilnahmeNotbetreuung(true);
+            kindRepository.save(kind);
+            return null;
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kind nicht gefunden");
     }
 }
