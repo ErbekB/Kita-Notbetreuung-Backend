@@ -5,15 +5,15 @@ import com.example.kitanotbetreuungbackend.kita.Kita;
 import com.example.kitanotbetreuungbackend.kita.KitaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class UserController {
 
     private KitaRepository kitaRepository;
@@ -25,19 +25,28 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
+    @GetMapping("/user")
+    public UserDTO user(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = sessionUserOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
+        return new UserDTO(sessionUser.getName(), sessionUser.isAdmin());
+    }
+
 
     @GetMapping("/index/{id}")
-    public IndexDTO hauptseite (@PathVariable long id) {
+    public IndexDTO hauptseite(@PathVariable long id) {
+        User benutzer = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
 
-        if (userRepository.existsById(id)) {
-            User Benutzer = userRepository.findById(id).get();
-            boolean Admin = Benutzer.isAdmin();
-            boolean Notbetreuung = Benutzer.getKita().isNotbetreuung();
-            List<Kind> kinderListe = Benutzer.getKind().get(0).getKitaGruppe().getKinder(); //TODO: Zurzeit wird nur das erste Kind ausgewählt.
+        boolean admin = benutzer.isAdmin();
+        boolean notbetreuung = benutzer.getKita().isNotbetreuung();
+        List<Kind> kinderListe = new ArrayList<>();
 
-            return new IndexDTO(Admin, Notbetreuung, kinderListe);
+        if (!benutzer.getKind().isEmpty()) {
+            kinderListe = benutzer.getKind().get(0).getKitaGruppe().getKinder();
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden");
+
+        return new IndexDTO(admin, notbetreuung, kinderListe);
     }
 
     @PostMapping("/index/{id}")
