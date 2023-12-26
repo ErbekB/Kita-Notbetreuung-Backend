@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 @RestController
 public class SessionController {
 

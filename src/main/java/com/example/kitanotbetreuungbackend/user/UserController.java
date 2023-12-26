@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 public class UserController {
 
     private KitaRepository kitaRepository;
