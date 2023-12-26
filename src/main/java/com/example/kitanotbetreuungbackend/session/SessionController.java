@@ -6,13 +6,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 @RestController
 public class SessionController {
 
@@ -59,4 +60,13 @@ public class SessionController {
 
         return new LogoutResponseDTO();
     }
+
+    @GetMapping("/auth-status")
+    public ResponseEntity<?> authStatus(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        if (sessionUserOptional.isPresent()) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
 }
