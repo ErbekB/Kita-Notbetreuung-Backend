@@ -33,19 +33,18 @@ public class UserController {
     }
 
 
-    @GetMapping("/index/{id}")
-    public IndexDTO hauptseite(@PathVariable long id) {
-        User benutzer = userRepository.findById(id)
+    @GetMapping("/index")
+    public IndexDTO hauptseite(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = sessionUserOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
 
-        boolean admin = benutzer.isAdmin();
-        boolean notbetreuung = benutzer.getKita().isNotbetreuung();
+        boolean admin = sessionUser.isAdmin();
+        boolean notbetreuung = sessionUser.getKita().isNotbetreuung();
         List<Kind> kinderListe = new ArrayList<>();
 
-        if (!benutzer.getKind().isEmpty()) {
-            kinderListe = benutzer.getKind().get(0).getKitaGruppe().getKinder();
+        if (!sessionUser.getKind().isEmpty()) {
+            kinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
         }
-
         return new IndexDTO(admin, notbetreuung, kinderListe);
     }
 
