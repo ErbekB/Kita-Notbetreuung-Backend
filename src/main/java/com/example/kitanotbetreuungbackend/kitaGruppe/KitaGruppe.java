@@ -2,6 +2,7 @@ package com.example.kitanotbetreuungbackend.kitaGruppe;
 
 import com.example.kitanotbetreuungbackend.kind.Kind;
 import com.example.kitanotbetreuungbackend.kita.Kita;
+import com.example.kitanotbetreuungbackend.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -20,6 +21,10 @@ public class KitaGruppe {
     private Kita kita;
     @OneToMany(mappedBy = "kitaGruppe", cascade = CascadeType.ALL)
     private List<Kind> kinder = new ArrayList<>();
+    @OneToOne
+    @JoinColumn(name = "admin_id")
+    private User admin;
+
 
     public KitaGruppe() {
     }
@@ -59,5 +64,13 @@ public class KitaGruppe {
 
     public void setKinder(List<Kind> kind) {
         this.kinder = kind;
+    }
+
+    public User getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(User admin) {
+        this.admin = admin;
     }
 }
