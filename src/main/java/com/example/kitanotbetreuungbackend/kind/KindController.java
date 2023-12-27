@@ -25,16 +25,17 @@ public class KindController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/notfall/{id}")
-    public KitaGruppeDTO uebersicht(@PathVariable long id) {
-        if (userRepository.existsById(id)) {
-            User benutzer = userRepository.findById(id).get();
-            List<Kind> KinderListe = benutzer.getKind().get(0).getKitaGruppe().getKinder();
-            boolean teilnahme = benutzer.getKind().get(0).isTeilnahmeNotbetreuung();
-            return new KitaGruppeDTO(KinderListe, teilnahme);
+    @GetMapping("/notfall")
+    public KitaGruppeDTO uebersicht(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = sessionUserOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
+            List<Kind> KinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
+            boolean teilnahme = sessionUser.getKind().get(0).isTeilnahmeNotbetreuung();
+            long id = sessionUser.getId();
+            return new KitaGruppeDTO(KinderListe, teilnahme, id);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden");
-    }
+
+
 
     @PostMapping("/notfall/{kindId}") //Todo return data to check the counter
     public StatusKindDTO bearbeitung(@PathVariable long kindId) {
