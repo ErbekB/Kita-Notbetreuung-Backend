@@ -22,6 +22,7 @@ public class Kind {
     private KitaGruppe kitaGruppe;
     private int counter;
     private boolean teilnahmeNotbetreuung;
+    private boolean notbetreuungNichtNotwendig;
 
     public Kind() {
     }
@@ -33,6 +34,7 @@ public class Kind {
         this.kitaGruppe = kitaGruppe;
         this.counter = 0;
         this.teilnahmeNotbetreuung = false;
+        this.notbetreuungNichtNotwendig = false;
     }
 
     public void setId(Long id) {
@@ -89,5 +91,13 @@ public class Kind {
 
     public void setTeilnahmeNotbetreuung(boolean teilnahmeNotbetreuung) {
         this.teilnahmeNotbetreuung = teilnahmeNotbetreuung;
+    }
+
+    public boolean isNotbetreuungNichtNotwendig() {
+        return notbetreuungNichtNotwendig;
+    }
+
+    public void setNotbetreuungNichtNotwendig(boolean notbetreuungNichtNotwendig) {
+        this.notbetreuungNichtNotwendig = notbetreuungNichtNotwendig;
     }
 }
