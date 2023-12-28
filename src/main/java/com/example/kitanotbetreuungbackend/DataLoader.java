@@ -43,6 +43,9 @@ public class DataLoader implements ApplicationRunner {
         KitaGruppe kitaGruppe = new KitaGruppe("Die Löwen", new ArrayList<>());
         kitaGruppeRepository.save(kitaGruppe);
 
+        kitaGruppe.setKita(kita);
+        kitaGruppeRepository.save(kitaGruppe);
+
         // Link KitaGruppe to Kita
         kita.getKitaGruppen().add(kitaGruppe);
         kitaRepository.save(kita);
@@ -65,5 +68,8 @@ public class DataLoader implements ApplicationRunner {
 
         Kind kind = new Kind("Bahadir", "Erbek", admin , kitaGruppe);
         kindRepository.save(kind);
+
+        kitaGruppe.setAdmin(admin);
+        kitaGruppeRepository.save(kitaGruppe);
     }
 }

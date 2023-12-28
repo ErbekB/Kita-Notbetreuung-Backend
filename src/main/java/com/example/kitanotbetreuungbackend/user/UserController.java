@@ -69,6 +69,7 @@ public class UserController {
         return null;
     }
 
+
     @PostMapping("/registrieren")
     public ResponseEntity<?> registerUser(@RequestBody RegistrierenRequestDTO registrieren) {
         String name = registrieren.getName();
@@ -120,7 +121,7 @@ public class UserController {
         // Neuen Benutzer erstellen und speichern
         User newUser = new User();
         newUser.setName(name);
-        newUser.setPasswort(passwort); // Hier sollten Sie das Passwort verschlüsseln
+        newUser.setPasswort(passwort);
         newUser.setAdmin(true);
         newUser.setKita(kita);
         userRepository.save(newUser);
