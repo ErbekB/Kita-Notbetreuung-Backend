@@ -5,6 +5,7 @@ import com.example.kitanotbetreuungbackend.user.User;
 import com.example.kitanotbetreuungbackend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -67,8 +68,17 @@ public class KindController {
         Kind kind = kindRepository.findById(kindId).get();
         kind.setNotbetreuungNichtNotwendig(true);
         kindRepository.save(kind);
-
         return null;
     }
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void resetProperties(){
+        List<Kind> kinder = kindRepository.findAll();
+        for (Kind kind : kinder) {
+            kind.setTeilnahmeNotbetreuung(false);
+            kind.setNotbetreuungNichtNotwendig(false);
+            kindRepository.save(kind);
+        }
+        }
+    }
 
-}
+

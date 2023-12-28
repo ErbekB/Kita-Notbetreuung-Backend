@@ -56,6 +56,7 @@ public class DataLoader implements ApplicationRunner {
             userRepository.save(eltern);
 
             Kind kind = new Kind("Vorname" + i, "Nachname" + i, eltern, kitaGruppe);
+            kind.setCounter((int) Math.floor(Math.random()*50));
             kindRepository.save(kind);
 
         }
