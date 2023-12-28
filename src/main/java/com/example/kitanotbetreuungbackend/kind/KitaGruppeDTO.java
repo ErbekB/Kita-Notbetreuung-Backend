@@ -8,10 +8,15 @@ public class KitaGruppeDTO {
     private boolean teilnahmeNotbetreuung;
     private long userId;
 
-    public KitaGruppeDTO(List<Kind> kinder, boolean teilnahmeNotbetreuung, long userId) {
+
+
+    private boolean notbetreuungNichtNotwendig;
+
+    public KitaGruppeDTO(List<Kind> kinder, boolean teilnahmeNotbetreuung, long userId, boolean notbetreuungNichtNotwendig) {
         this.kinder = kinder;
         this.teilnahmeNotbetreuung = teilnahmeNotbetreuung;
         this.userId = userId;
+        this.notbetreuungNichtNotwendig = notbetreuungNichtNotwendig;
     }
 
     public long getUserId() {
@@ -36,5 +41,12 @@ public class KitaGruppeDTO {
 
     public void setTeilnahmeNotbetreuung(boolean teilnahmeNotbetreuung) {
         this.teilnahmeNotbetreuung = teilnahmeNotbetreuung;
+    }
+    public boolean isNotbetreuungNichtNotwendig() {
+        return notbetreuungNichtNotwendig;
+    }
+
+    public void setNotbetreuungNichtNotwendig(boolean notbetreuungNichtNotwendig) {
+        this.notbetreuungNichtNotwendig = notbetreuungNichtNotwendig;
     }
 }

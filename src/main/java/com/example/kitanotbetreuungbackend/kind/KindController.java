@@ -29,12 +29,12 @@ public class KindController {
     public KitaGruppeDTO uebersicht(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
         User sessionUser = sessionUserOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
-            List<Kind> KinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
-            boolean teilnahme = sessionUser.getKind().get(0).isTeilnahmeNotbetreuung();
-            long id = sessionUser.getId();
-            return new KitaGruppeDTO(KinderListe, teilnahme, id);
-        }
-
+        List<Kind> KinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
+        boolean teilnahme = sessionUser.getKind().get(0).isTeilnahmeNotbetreuung();
+        long id = sessionUser.getId();
+        boolean notbetreuungNichtNotwendig = sessionUser.getKind().get(0).isNotbetreuungNichtNotwendig();
+        return new KitaGruppeDTO(KinderListe, teilnahme, id, notbetreuungNichtNotwendig);
+    }
 
 
     @PostMapping("/notfall/{kindId}") //Todo return data to check the counter
@@ -42,31 +42,33 @@ public class KindController {
         if (userRepository.existsById(kindId)) {
             Kind kind = kindRepository.findById(kindId).get();
             kind.setTeilnahmeNotbetreuung(!kind.isTeilnahmeNotbetreuung());
-            kind.setCounter(kind.getCounter()+1); //countertest
+            kind.setCounter(kind.getCounter() + 1); //countertest
             kindRepository.save(kind);
             return null;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kind nicht gefunden");
     }
+
     @PostMapping("/notfall/aendern/{kindId}")
     public StatusKindDTO aendern(@PathVariable long kindId) {
         if (userRepository.existsById(kindId)) {
             Kind kind = kindRepository.findById(kindId).get();
             kind.setTeilnahmeNotbetreuung(!kind.isTeilnahmeNotbetreuung());
-            kind.setCounter(kind.getCounter()-1);
+            kind.setCounter(kind.getCounter() - 1);
             kindRepository.save(kind);
             return null;
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kind nicht gefunden");
     }
+
     //Teilnahme zurückziehen
     @PostMapping("notfall/teilnahme/{kindId}")
     public StatusKindDTO keineTeilnahme(@PathVariable long kindId) {
-    if(userRepository.existsById(kindId)){
         Kind kind = kindRepository.findById(kindId).get();
+        kind.setNotbetreuungNichtNotwendig(true);
+        kindRepository.save(kind);
 
-        kindRepository.delete(kind);
+        return null;
     }
-    return null;
-    }
+
 }
