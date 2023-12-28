@@ -8,4 +8,6 @@ import java.util.Optional;
 @Repository
 public interface KitaRepository extends JpaRepository<Kita, Long> {
     Optional<Kita> findByName(String kitaName);
+
+    Optional<Kita> findByNameAndPostleitzahl(String kitaName, int postleitzahl);
 }

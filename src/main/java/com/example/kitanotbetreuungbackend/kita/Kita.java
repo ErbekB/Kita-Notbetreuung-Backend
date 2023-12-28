@@ -15,6 +15,7 @@ public class Kita {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private int postleitzahl;
     private boolean isNotbetreuung;
     @OneToMany(mappedBy = "kita", cascade = CascadeType.ALL)
     private List<KitaGruppe> kitaGruppen = new ArrayList<>();
@@ -43,6 +44,14 @@ public class Kita {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getPostleitzahl() {
+        return postleitzahl;
+    }
+
+    public void setPostleitzahl(int postleitzahl) {
+        this.postleitzahl = postleitzahl;
     }
 
     public List<KitaGruppe> getKitaGruppen() {
