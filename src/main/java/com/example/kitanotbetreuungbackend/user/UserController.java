@@ -132,4 +132,31 @@ public class UserController {
 
         return ResponseEntity.ok(newUser);
     }
+    @DeleteMapping("/userloeschen")
+    public ResponseEntity<?> deleteParent(@ModelAttribute("sessionUser")Optional<User> sessionUser) {
+        User user = sessionUser
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
+       userRepository.deleteById(user.getId());
+       userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/abc")
+    public ResponseEntity<?> namenAendern(@RequestBody UserNamenAendernDTO userName, @ModelAttribute("sessionUser") User user){
+        System.out.println("Hallo");
+
+               /* .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));*/
+        user.setName(userName.getUsername());
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/passwortAendern")
+    public User passwortAendern(@RequestParam String passwort, @ModelAttribute("sessionUser") Optional<User> sessionUser){
+        User user = sessionUser
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
+        user.setPasswort(passwort);
+        userRepository.save(user);
+        return null;
+    }
 }
