@@ -33,7 +33,7 @@ public class AdminController {
     @GetMapping("/admin/eltern")
     public ResponseEntity<?> getParentsOfGroup(@ModelAttribute("sessionUser") User sessionUser) {
         if (sessionUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Benutzer ist nicht eingeloggt.");
+            return null;
         }
 
         if (!sessionUser.isAdmin()) {
@@ -59,7 +59,7 @@ public class AdminController {
                     elternDTO.setElternId(user.getId());
                     elternDTO.setElternName(user.getName());
                     elternDTO.setKinder(user.getKind().stream()
-                            .map(kind -> new KitaGruppeElternDTO.ElternKindDTO.KindDTO(kind.getId(), kind.getVorname(), kind.getNachname()))
+                            .map(kind -> new KitaGruppeElternDTO.ElternKindDTO.KindDTO(kind.getId(), kind.getVorname(), kind.getNachname(), kind.getCounter()))
                             .collect(Collectors.toList()));
                     return elternDTO;
                 })
@@ -78,7 +78,7 @@ public class AdminController {
 
         // Neuen User erstellen
         User newUser = new User();
-        newUser.setName(eltern.getName().toLowerCase());
+        newUser.setName(eltern.getName());
         newUser.setPasswort("Hallo123");
         newUser.setAdmin(false);
         newUser.setKita(sessionUser.getKita());
