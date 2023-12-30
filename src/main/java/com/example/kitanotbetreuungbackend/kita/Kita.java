@@ -27,7 +27,7 @@ public class Kita {
     public Kita(String name, List<KitaGruppe> kitaGruppen) {
         this.name = name;
         this.kitaGruppen = kitaGruppen;
-        this.isNotbetreuung = false;
+        this.isNotbetreuung = true;
     }
 
     public void setId(Long id) {

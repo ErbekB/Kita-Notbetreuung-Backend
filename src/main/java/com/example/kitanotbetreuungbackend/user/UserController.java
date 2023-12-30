@@ -55,9 +55,8 @@ public class UserController {
         return new IndexDTO(admin, notbetreuung, kinderListe);
     }
 
-    @PostMapping("/index/{id}")
+    @GetMapping("/index/notbetreuung")
     public Kita statusNotbetreuung(@PathVariable long id) {
-
         if (userRepository.existsById(id)) {
             User Benutzer = userRepository.findById(id).get();
             if (Benutzer.isAdmin()) {

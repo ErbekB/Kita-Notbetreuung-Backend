@@ -20,9 +20,9 @@ public class Kind {
     @JsonIgnore
     @JoinColumn(name = "kitagruppe_id")
     private KitaGruppe kitaGruppe;
-    private int counter;
-    private boolean teilnahmeNotbetreuung;
-    private boolean notbetreuungNichtNotwendig;
+    private int counter = 0;
+    private boolean teilnahmeNotbetreuung = false;
+    private boolean notbetreuungNichtNotwendig = false;
 
     public Kind() {
     }

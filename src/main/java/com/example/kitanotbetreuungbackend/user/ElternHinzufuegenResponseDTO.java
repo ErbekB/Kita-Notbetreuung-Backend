@@ -57,11 +57,13 @@ public class ElternHinzufuegenResponseDTO {
         private Long id;
         private String vorname;
         private String nachname;
+        private int counter;
 
         public KindInfo(Kind kind) {
             this.id = kind.getId();
             this.vorname = kind.getVorname();
             this.nachname = kind.getNachname();
+            this.counter = kind.getCounter();
         }
 
         public Long getId() {
@@ -86,6 +88,14 @@ public class ElternHinzufuegenResponseDTO {
 
         public void setNachname(String nachname) {
             this.nachname = nachname;
+        }
+
+        public int getCounter() {
+            return counter;
+        }
+
+        public void setCounter(int counter) {
+            this.counter = counter;
         }
     }
 }
