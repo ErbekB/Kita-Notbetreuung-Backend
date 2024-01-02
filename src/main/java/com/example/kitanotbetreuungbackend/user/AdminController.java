@@ -45,8 +45,6 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Admin ist keiner Kitagruppe zugeordnet.");
         }
 
-        List<Kind> kinderInGruppe = kindRepository.findAllByKitaGruppe(adminKitagruppe);
-
         KitaGruppeElternDTO dto = new KitaGruppeElternDTO();
         dto.setKitaName(adminKitagruppe.getKita().getName());
         dto.setKitaGruppeName(adminKitagruppe.getName());
@@ -57,7 +55,6 @@ public class AdminController {
                     KitaGruppeElternDTO.ElternKindDTO elternDTO = new KitaGruppeElternDTO.ElternKindDTO();
                     elternDTO.setElternId(user.getId());
                     elternDTO.setElternName(user.getName());
-                    // Fügen Sie Kinder hinzu, wenn vorhanden
                     elternDTO.setKinder(user.getKind().stream()
                             .map(kind -> new KitaGruppeElternDTO.ElternKindDTO.KindDTO(kind.getId(), kind.getVorname(), kind.getNachname(), kind.getCounter(), kind.getUser().getId()))
                             .collect(Collectors.toList()));
