@@ -59,7 +59,7 @@ public class AdminController {
                     elternDTO.setElternId(user.getId());
                     elternDTO.setElternName(user.getName());
                     elternDTO.setKinder(user.getKind().stream()
-                            .map(kind -> new KitaGruppeElternDTO.ElternKindDTO.KindDTO(kind.getId(), kind.getVorname(), kind.getNachname(), kind.getCounter()))
+                            .map(kind -> new KitaGruppeElternDTO.ElternKindDTO.KindDTO(kind.getId(), kind.getVorname(), kind.getNachname(), kind.getCounter(), kind.getUser().getId()))
                             .collect(Collectors.toList()));
                     return elternDTO;
                 })
@@ -89,6 +89,7 @@ public class AdminController {
         neuesKind.setNachname(eltern.getKindNachname());
         neuesKind.setUser(newUser);
         neuesKind.setKitaGruppe(sessionUser.getKita().getKitaGruppen().get(0));
+        neuesKind.setTeilnahmeNotbetreuung(false);
 
         // Kind und Elternteil speichern
         userRepository.save(newUser);
@@ -144,7 +145,83 @@ public class AdminController {
 
 
     // Methode zum Aktualisieren des Counters eines Kindes
-//    @PutMapping("/admin/kind-counter/{kindId}")
+    @PutMapping("/admin/kind-counter/{kindId}")
+    public ResponseEntity<?> kindCounterAktualisieren(@RequestBody CounterRequestDTO counter, @PathVariable long kindId, @ModelAttribute("sessionUser") User user) {
+        if (!user.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nur Admins können den Counter aktualisieren.");
+        }
+
+        Optional<Kind> kindOptional = kindRepository.findById(kindId);
+        if (kindOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kind wurde nicht gefunden");
+        }
+
+        Kind kind = kindOptional.get();
+
+        // Prüfen, ob das Kind zur Kita des Admins gehört
+        if (!kind.getKitaGruppe().getKita().equals(user.getKita())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Dieses Kind gehört nicht zur Kita des Admins.");
+        }
+
+        // Validierung des neuen Counter-Werts
+        if (counter.getNeuerCounter() < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Counter-Wert kann nicht negativ sein.");
+        }
+
+        kind.setCounter(counter.getNeuerCounter());
+        kindRepository.save(kind);
+
+        // Rückgabe einer sinnvollen Antwort
+        return ResponseEntity.ok("Counter des Kindes wurde erfolgreich auf " + counter.getNeuerCounter() + " gesetzt.");
+    }
+
+    @PutMapping("/admin/reset-counter")
+    public ResponseEntity<?> resetCounter(@ModelAttribute("sessionUser") User user) {
+        if (!user.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nur Admins können den Counter zurücksetzen.");
+        }
+
+        KitaGruppe kitaGruppe = kitaGruppeRepository.findByAdmin(user);
+        if (kitaGruppe == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Keine Kitagruppe für diesen Admin gefunden.");
+        }
+
+        List<Kind> kinder = kitaGruppe.getKinder();
+        if (kinder.isEmpty()) {
+            return ResponseEntity.ok("Es gibt keine Kinder in dieser Kitagruppe, um den Counter zurückzusetzen.");
+        }
+
+        for (Kind kind : kinder) {
+            kind.setCounter(0);
+            kindRepository.save(kind);
+        }
+
+        return ResponseEntity.ok("Counter aller Kinder in der Kitagruppe erfolgreich auf 0 zurückgesetzt.");
+    }
+
+    @DeleteMapping("/admin/eltern/{elternId}/kind/{kindId}")
+    public ResponseEntity<?> kindLoeschen(@PathVariable Long elternId, @PathVariable Long kindId, @ModelAttribute("sessionUser") User user) {
+        if (!user.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nur Admins können Kinder löschen.");
+        }
+
+        Optional<Kind> kindOptional = kindRepository.findById(kindId);
+        if (kindOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kind nicht gefunden.");
+        }
+
+        Kind kind = kindOptional.get();
+        if (!kind.getUser().getId().equals(elternId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Das Kind gehört nicht zu diesem Elternteil.");
+        }
+
+        kindRepository.delete(kind);
+        return ResponseEntity.ok("Kind erfolgreich gelöscht.");
+    }
+
+
+
+
 
 
 }

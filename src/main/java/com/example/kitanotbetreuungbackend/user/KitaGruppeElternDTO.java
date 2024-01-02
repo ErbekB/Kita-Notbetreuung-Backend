@@ -65,12 +65,14 @@ public class KitaGruppeElternDTO {
             private String vorname;
             private String nachname;
             private int counter;
+            private Long elternId;
 
-            public KindDTO(Long kindId, String vorname, String nachname, int counter) {
+            public KindDTO(Long kindId, String vorname, String nachname, int counter, Long elternId) {
                 this.kindId = kindId;
                 this.vorname = vorname;
                 this.nachname = nachname;
                 this.counter = counter;
+                this.elternId = elternId;
             }
 
             public Long getKindId() {
@@ -99,6 +101,14 @@ public class KitaGruppeElternDTO {
 
             public int getCounter() {
                 return counter;
+            }
+
+            public Long getElternId() {
+                return elternId;
+            }
+
+            public void setElternId(Long elternId) {
+                this.elternId = elternId;
             }
 
             public void setCounter(int counter) {
