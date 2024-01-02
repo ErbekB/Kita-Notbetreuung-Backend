@@ -48,13 +48,17 @@ public class UserController {
         boolean notbetreuung = sessionUser.getKita().isNotbetreuung();
         List<Kind> kinderListe = new ArrayList<>();
         String kitaName = sessionUser.getKita().getName();
-        String kitaGruppeName = sessionUser.getKind().get(0).getKitaGruppe().getName();
+        String kitaGruppeName = "";
 
-        if (!sessionUser.getKind().isEmpty()) {
+
+        if (!sessionUser.getKind().isEmpty() && sessionUser.getKind().get(0).getKitaGruppe() != null) {
+            kitaGruppeName = sessionUser.getKind().get(0).getKitaGruppe().getName();
             kinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
         }
+
         return new IndexDTO(admin, notbetreuung, kinderListe, kitaName, kitaGruppeName);
     }
+
 
     @PostMapping("/index")
     public Kita statusNotbetreuung(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
