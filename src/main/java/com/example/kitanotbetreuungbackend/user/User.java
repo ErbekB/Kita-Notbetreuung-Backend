@@ -2,6 +2,7 @@ package com.example.kitanotbetreuungbackend.user;
 
 import com.example.kitanotbetreuungbackend.kind.Kind;
 import com.example.kitanotbetreuungbackend.kita.Kita;
+import com.example.kitanotbetreuungbackend.session.Session;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public class User {
     private boolean isAdmin;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Kind> kind = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Session> sessions;
     @ManyToOne
     private Kita kita;
 
@@ -81,5 +84,13 @@ public class User {
 
     public void setKita(Kita kita) {
         this.kita = kita;
+    }
+
+    public List<Session> getSessions() {
+        return sessions;
+    }
+
+    public void setSessions(List<Session> sessions) {
+        this.sessions = sessions;
     }
 }

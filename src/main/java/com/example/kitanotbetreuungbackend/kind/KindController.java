@@ -48,8 +48,9 @@ public class KindController {
 
         boolean teilnahme = sessionUser.getKind().get(0).isTeilnahmeNotbetreuung();
         boolean notbetreuungNichtNotwendig = sessionUser.getKind().get(0).isNotbetreuungNichtNotwendig();
+        boolean statusNotbetreuung = sessionUser.getKita().isNotbetreuung();
 
-        return new KitaGruppeDTO(kinderDTOs, teilnahme, sessionUser.getId(), notbetreuungNichtNotwendig);
+        return new KitaGruppeDTO(kinderDTOs, teilnahme, sessionUser.getId(), notbetreuungNichtNotwendig, statusNotbetreuung);
     }
 
 
