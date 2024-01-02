@@ -7,12 +7,16 @@ import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppe;
 import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppeRepository;
 import com.example.kitanotbetreuungbackend.session.LoginRequestDTO;
 import com.example.kitanotbetreuungbackend.session.RegistrierenRequestDTO;
+import com.example.kitanotbetreuungbackend.session.Session;
+import com.example.kitanotbetreuungbackend.session.SessionRepository;
+import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,12 +28,14 @@ public class UserController {
     private KitaRepository kitaRepository;
     private UserRepository userRepository;
     private KitaGruppeRepository kitaGruppeRepository;
+    private SessionRepository sessionRepository;
 
     @Autowired
-    public UserController(KitaRepository kitaRepository, UserRepository userRepository, KitaGruppeRepository kitaGruppeRepository) {
+    public UserController(KitaRepository kitaRepository, UserRepository userRepository, KitaGruppeRepository kitaGruppeRepository, SessionRepository sessionRepository) {
         this.kitaRepository = kitaRepository;
         this.userRepository = userRepository;
         this.kitaGruppeRepository = kitaGruppeRepository;
+        this.sessionRepository = sessionRepository;
     }
 
     @GetMapping("/user")
@@ -132,29 +138,31 @@ public class UserController {
         return ResponseEntity.ok(newUser);
     }
     @DeleteMapping("/userloeschen")
-    public ResponseEntity<?> deleteParent(@ModelAttribute("sessionUser")Optional<User> sessionUser) {
+    public User userLoeschen(@ModelAttribute("sessionUser")Optional<User> sessionUser) {
         User user = sessionUser
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
-       userRepository.deleteById(user.getId());
-       userRepository.save(user);
-        return ResponseEntity.ok().build();
+
+        long test = user.getId();
+
+        System.out.println(test);
+       userRepository.delete(user);
+        return null;
     }
 
     @PostMapping("/abc")
-    public ResponseEntity<?> namenAendern(@RequestBody UserNamenAendernDTO userName, @ModelAttribute("sessionUser") User user){
-        System.out.println("Hallo");
-
-               /* .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));*/
-        user.setName(userName.getUsername());
+    public User namenAendern(@RequestBody UserNamenAendernDTO userName, @ModelAttribute("sessionUser") Optional<User> user1){
+            User user = user1
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
+            user.setName(userName.getUsername());
         userRepository.save(user);
-        return ResponseEntity.ok().build();
+        return null;
     }
 
     @PostMapping("/passwortAendern")
-    public User passwortAendern(@RequestParam String passwort, @ModelAttribute("sessionUser") Optional<User> sessionUser){
+    public User passwortAendern(@RequestBody UserPasswortAendernDTO userPasswort, @ModelAttribute("sessionUser") Optional<User> sessionUser){
         User user = sessionUser
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
-        user.setPasswort(passwort);
+        user.setPasswort(userPasswort.getPasswort());
         userRepository.save(user);
         return null;
     }

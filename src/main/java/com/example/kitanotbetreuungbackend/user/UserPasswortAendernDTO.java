@@ -3,8 +3,7 @@ package com.example.kitanotbetreuungbackend.user;
 public class UserPasswortAendernDTO {
     private String passwort;
 
-    public UserPasswortAendernDTO(String passwort) {
-        this.passwort = passwort;
+    public UserPasswortAendernDTO() {
     }
 
     public String getPasswort() {

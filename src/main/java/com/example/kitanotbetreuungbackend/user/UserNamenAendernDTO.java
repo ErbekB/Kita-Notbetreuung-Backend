@@ -3,8 +3,7 @@ package com.example.kitanotbetreuungbackend.user;
 public class UserNamenAendernDTO {
     private String username;
 
-    public UserNamenAendernDTO(String username) {
-        this.username = username;
+    public UserNamenAendernDTO() {
     }
 
     public String getUsername() {
