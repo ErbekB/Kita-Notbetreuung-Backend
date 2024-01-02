@@ -5,7 +5,6 @@ import com.example.kitanotbetreuungbackend.kita.Kita;
 import com.example.kitanotbetreuungbackend.kita.KitaRepository;
 import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppe;
 import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppeRepository;
-import com.example.kitanotbetreuungbackend.session.LoginRequestDTO;
 import com.example.kitanotbetreuungbackend.session.RegistrierenRequestDTO;
 import com.example.kitanotbetreuungbackend.session.Session;
 import com.example.kitanotbetreuungbackend.session.SessionRepository;
@@ -54,22 +53,24 @@ public class UserController {
         boolean admin = sessionUser.isAdmin();
         boolean notbetreuung = sessionUser.getKita().isNotbetreuung();
         List<Kind> kinderListe = new ArrayList<>();
+        String kitaName = sessionUser.getKita().getName();
+        String kitaGruppeName = sessionUser.getKind().get(0).getKitaGruppe().getName();
 
         if (!sessionUser.getKind().isEmpty()) {
             kinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
         }
-        return new IndexDTO(admin, notbetreuung, kinderListe);
+        return new IndexDTO(admin, notbetreuung, kinderListe, kitaName, kitaGruppeName);
     }
 
-    @GetMapping("/index/notbetreuung")
-    public Kita statusNotbetreuung(@PathVariable long id) {
-        if (userRepository.existsById(id)) {
-            User Benutzer = userRepository.findById(id).get();
-            if (Benutzer.isAdmin()) {
-                Benutzer.getKita().setNotbetreuung(!Benutzer.getKita().isNotbetreuung());
-                userRepository.save(Benutzer);
-                return Benutzer.getKita();
-            }
+    @PostMapping("/index")
+    public Kita statusNotbetreuung(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = sessionUserOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
+
+        if (sessionUser.isAdmin()) {
+            sessionUser.getKita().setNotbetreuung(!sessionUser.getKita().isNotbetreuung());
+            userRepository.save(sessionUser);
+            return sessionUser.getKita();
         }
         return null;
     }
