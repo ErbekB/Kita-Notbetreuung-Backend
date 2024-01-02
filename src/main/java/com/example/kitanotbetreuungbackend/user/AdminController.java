@@ -51,13 +51,13 @@ public class AdminController {
         dto.setKitaName(adminKitagruppe.getKita().getName());
         dto.setKitaGruppeName(adminKitagruppe.getName());
 
-        List<KitaGruppeElternDTO.ElternKindDTO> elternListe = kinderInGruppe.stream()
-                .map(Kind::getUser)
-                .distinct()
+        List<User> alleEltern = userRepository.findAllByKita(sessionUser.getKita());
+        List<KitaGruppeElternDTO.ElternKindDTO> elternListe = alleEltern.stream()
                 .map(user -> {
                     KitaGruppeElternDTO.ElternKindDTO elternDTO = new KitaGruppeElternDTO.ElternKindDTO();
                     elternDTO.setElternId(user.getId());
                     elternDTO.setElternName(user.getName());
+                    // Fügen Sie Kinder hinzu, wenn vorhanden
                     elternDTO.setKinder(user.getKind().stream()
                             .map(kind -> new KitaGruppeElternDTO.ElternKindDTO.KindDTO(kind.getId(), kind.getVorname(), kind.getNachname(), kind.getCounter(), kind.getUser().getId()))
                             .collect(Collectors.toList()));
