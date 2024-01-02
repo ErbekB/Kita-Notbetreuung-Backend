@@ -5,6 +5,7 @@ import com.example.kitanotbetreuungbackend.user.User;
 import com.example.kitanotbetreuungbackend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,6 +35,7 @@ public class KindController {
 
         List<Kind> kinder = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
         List<KindDTO> kinderDTOs = kinder.stream()
+                .filter(kind -> !kind.isNotbetreuungNichtNotwendig())
                 .map(kind -> new KindDTO(
                         kind.getId(),
                         kind.getVorname(),
@@ -53,37 +55,77 @@ public class KindController {
 
 
     @PostMapping("/notfall/{kindId}") //Todo return data to check the counter
-    public StatusKindDTO bearbeitung(@PathVariable long kindId) {
-        if (userRepository.existsById(kindId)) {
-            Kind kind = kindRepository.findById(kindId).get();
-            kind.setTeilnahmeNotbetreuung(!kind.isTeilnahmeNotbetreuung());
-            kind.setCounter(kind.getCounter() + 1); //countertest
-            kindRepository.save(kind);
-            return null;
+    public ResponseEntity<?> bearbeitung(@PathVariable long kindId, @ModelAttribute("sessionUser") User sessionUser) {
+        Optional<Kind> kindOptional = kindRepository.findById(kindId);
+
+        if (kindOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Kind nicht gefunden");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kind nicht gefunden");
+
+        Kind kind = kindOptional.get();
+
+        // Überprüfen, ob das Kind dem eingeloggten User gehört
+        if (!kind.getUser().getId().equals(sessionUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nicht berechtigt, die Teilnahme für dieses Kind zu ändern");
+        }
+
+        // Aktualisierung der Teilnahme und des Counters
+        kind.setTeilnahmeNotbetreuung(!kind.isTeilnahmeNotbetreuung());
+        kind.setCounter(kind.getCounter() + 1);
+        kindRepository.save(kind);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/notfall/aendern/{kindId}")
-    public StatusKindDTO aendern(@PathVariable long kindId) {
-        if (userRepository.existsById(kindId)) {
-            Kind kind = kindRepository.findById(kindId).get();
-            kind.setTeilnahmeNotbetreuung(!kind.isTeilnahmeNotbetreuung());
-            kind.setCounter(kind.getCounter() - 1);
-            kindRepository.save(kind);
-            return null;
+    public ResponseEntity<?> aendern(@PathVariable long kindId, @ModelAttribute("sessionUser") User sessionUser) {
+        Optional<Kind> kindOptional = kindRepository.findById(kindId);
+
+        if (kindOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Kind nicht gefunden");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kind nicht gefunden");
+
+        Kind kind = kindOptional.get();
+
+        // Überprüfen, ob das Kind dem eingeloggten User gehört
+        if (!kind.getUser().getId().equals(sessionUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nicht berechtigt, die Teilnahme für dieses Kind zu ändern");
+        }
+
+        // Aktualisierung der Teilnahme und des Counters
+        kind.setTeilnahmeNotbetreuung(!kind.isTeilnahmeNotbetreuung());
+        if (kind.isTeilnahmeNotbetreuung()) {
+            kind.setCounter(kind.getCounter() + 1); // Erhöhen, wenn das Kind jetzt teilnimmt
+        } else {
+            kind.setCounter(kind.getCounter() > 0 ? kind.getCounter() - 1 : 0); // Verringern, aber nicht unter 0
+        }
+        kindRepository.save(kind);
+
+        return ResponseEntity.ok().build();
     }
 
+
     //Teilnahme zurückziehen
-    @PostMapping("notfall/teilnahme/{kindId}")
-    public StatusKindDTO keineTeilnahme(@PathVariable long kindId) {
-        Kind kind = kindRepository.findById(kindId).get();
+    @PostMapping("/notfall/teilnahme/{kindId}")
+    public ResponseEntity<?> keineTeilnahme(@PathVariable long kindId, @ModelAttribute("sessionUser") User sessionUser) {
+        Optional<Kind> kindOptional = kindRepository.findById(kindId);
+
+        if (kindOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kind nicht gefunden.");
+        }
+
+        Kind kind = kindOptional.get();
+
+        // Überprüfen, ob das Kind dem eingeloggten User gehört
+        if (!kind.getUser().getId().equals(sessionUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nicht berechtigt, diese Änderung für dieses Kind durchzuführen.");
+        }
+
         kind.setNotbetreuungNichtNotwendig(true);
         kindRepository.save(kind);
-        return null;
+
+        return ResponseEntity.ok("Die Teilnahme des Kindes an der Notbetreuung wurde erfolgreich als nicht notwendig markiert.");
     }
+
     @Scheduled(cron = "0 0 0 * * ?")
     public void resetProperties(){
         List<Kind> kinder = kindRepository.findAll();
