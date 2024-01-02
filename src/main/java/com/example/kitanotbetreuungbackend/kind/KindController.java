@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
@@ -30,12 +31,25 @@ public class KindController {
     public KitaGruppeDTO uebersicht(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
         User sessionUser = sessionUserOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
-        List<Kind> KinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
+
+        List<Kind> kinder = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
+        List<KindDTO> kinderDTOs = kinder.stream()
+                .map(kind -> new KindDTO(
+                        kind.getId(),
+                        kind.getVorname(),
+                        kind.getNachname(),
+                        kind.getCounter(),
+                        kind.getUser().getId(),
+                        kind.isTeilnahmeNotbetreuung(),
+                        kind.isNotbetreuungNichtNotwendig()))
+                .collect(Collectors.toList());
+
         boolean teilnahme = sessionUser.getKind().get(0).isTeilnahmeNotbetreuung();
-        long id = sessionUser.getId();
         boolean notbetreuungNichtNotwendig = sessionUser.getKind().get(0).isNotbetreuungNichtNotwendig();
-        return new KitaGruppeDTO(KinderListe, teilnahme, id, notbetreuungNichtNotwendig);
+
+        return new KitaGruppeDTO(kinderDTOs, teilnahme, sessionUser.getId(), notbetreuungNichtNotwendig);
     }
+
 
 
     @PostMapping("/notfall/{kindId}") //Todo return data to check the counter
