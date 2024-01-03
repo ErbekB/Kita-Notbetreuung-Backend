@@ -26,6 +26,7 @@ public class KitaGruppe {
     private User admin;
     @OneToMany
     private List<Verlauf> verläufe = new ArrayList<>();
+    private boolean abstimmungAbgeschlossen = false;
 
 
     public KitaGruppe() {
@@ -74,6 +75,14 @@ public class KitaGruppe {
 
     public void setAdmin(User admin) {
         this.admin = admin;
+    }
+
+    public boolean isAbstimmungAbgeschlossen() {
+        return abstimmungAbgeschlossen;
+    }
+
+    public void setAbstimmungAbgeschlossen(boolean abstimmungAbgeschlossen) {
+        this.abstimmungAbgeschlossen = abstimmungAbgeschlossen;
     }
 
     public List<Verlauf> getVerläufe() {
