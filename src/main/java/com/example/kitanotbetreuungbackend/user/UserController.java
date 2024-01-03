@@ -142,7 +142,7 @@ public class UserController {
         kitaGruppe.setAdmin(newUser);
         kitaGruppeRepository.save(kitaGruppe);
 
-        return ResponseEntity.ok(newUser);
+        return ResponseEntity.ok().body(newUser);
     }
     @DeleteMapping("/userloeschen")
     public User userLoeschen(@ModelAttribute("sessionUser")Optional<User> sessionUser) {
