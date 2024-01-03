@@ -60,6 +60,8 @@ public class UserController {
         if (!sessionUser.getKind().isEmpty() && sessionUser.getKind().get(0).getKitaGruppe() != null) {
             kitaGruppeName = sessionUser.getKind().get(0).getKitaGruppe().getName();
             kinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
+        } else {
+            kitaGruppeName = sessionUser.getKita().getKitaGruppen().get(0).getName();
         }
 
         return new IndexDTO(admin, notbetreuung, kinderListe, kitaName, kitaGruppeName);
@@ -67,16 +69,16 @@ public class UserController {
 
 
     @PostMapping("/index")
-    public Kita statusNotbetreuung(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+    public ResponseEntity<?> statusNotbetreuung(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
         User sessionUser = sessionUserOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
 
         if (sessionUser.isAdmin()) {
             sessionUser.getKita().setNotbetreuung(!sessionUser.getKita().isNotbetreuung());
             userRepository.save(sessionUser);
-            return sessionUser.getKita();
+            return ResponseEntity.ok("Die Notbetreuung wurde umgeschaltet");
         }
-        return null;
+        return ResponseEntity.badRequest().body("Nur Admins können die Notbetreuung an oder ausschalten");
     }
 
 

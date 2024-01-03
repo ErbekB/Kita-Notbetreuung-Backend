@@ -33,6 +33,10 @@ public class KindController {
         User sessionUser = sessionUserOptional
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
 
+        if (sessionUser.getKind().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Admin muss sein Kind hinzufügen");
+        }
+
         List<Kind> kinder = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
         List<KindDTO> kinderDTOs = kinder.stream()
                 .filter(kind -> !kind.isNotbetreuungNichtNotwendig())
