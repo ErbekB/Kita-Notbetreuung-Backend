@@ -24,7 +24,8 @@ public class KitaGruppe {
     @OneToOne
     @JoinColumn(name = "admin_id")
     private User admin;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "verlauf_id")
     private List<Verlauf> verläufe = new ArrayList<>();
     private boolean abstimmungAbgeschlossen = false;
 
