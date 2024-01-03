@@ -60,6 +60,8 @@ public class UserController {
         if (!sessionUser.getKind().isEmpty() && sessionUser.getKind().get(0).getKitaGruppe() != null) {
             kitaGruppeName = sessionUser.getKind().get(0).getKitaGruppe().getName();
             kinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
+        } else {
+            kitaGruppeName = sessionUser.getKita().getKitaGruppen().get(0).getName();
         }
 
         return new IndexDTO(admin, notbetreuung, kinderListe, kitaName, kitaGruppeName);
