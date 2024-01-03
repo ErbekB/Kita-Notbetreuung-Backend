@@ -24,6 +24,8 @@ public class KitaGruppe {
     @OneToOne
     @JoinColumn(name = "admin_id")
     private User admin;
+    @OneToMany
+    private List<Verlauf> verläufe = new ArrayList<>();
 
 
     public KitaGruppe() {
@@ -72,5 +74,17 @@ public class KitaGruppe {
 
     public void setAdmin(User admin) {
         this.admin = admin;
+    }
+
+    public List<Verlauf> getVerläufe() {
+        return verläufe;
+    }
+
+    public void setVerläufe(List<Verlauf> verläufe) {
+        this.verläufe = verläufe;
+    }
+
+    public void addVerlauf(Verlauf verlauf) {
+        this.verläufe.add(verlauf);
     }
 }
