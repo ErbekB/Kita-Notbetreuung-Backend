@@ -1,6 +1,9 @@
 package com.example.kitanotbetreuungbackend.kind;
 
 import com.example.kitanotbetreuungbackend.kita.KitaRepository;
+import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppe;
+import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppeRepository;
+import com.example.kitanotbetreuungbackend.kitaGruppe.StatusNotfallbetreuungDTO;
 import com.example.kitanotbetreuungbackend.user.User;
 import com.example.kitanotbetreuungbackend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +21,13 @@ import java.util.stream.Collectors;
 @CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 public class KindController {
     private KindRepository kindRepository;
-    private KitaRepository kitaRepository;
+    private KitaGruppeRepository kitaGruppeRepository;
     private UserRepository userRepository;
 
     @Autowired
-    public KindController(KindRepository kindRepository, KitaRepository kitaRepository, UserRepository userRepository) {
+    public KindController(KindRepository kindRepository, KitaGruppeRepository kitaGruppeRepository, UserRepository userRepository) {
         this.kindRepository = kindRepository;
-        this.kitaRepository = kitaRepository;
+        this.kitaGruppeRepository = kitaGruppeRepository;
         this.userRepository = userRepository;
     }
 
@@ -56,6 +59,45 @@ public class KindController {
 
         return new KitaGruppeDTO(kinderDTOs, teilnahme, sessionUser.getId(), notbetreuungNichtNotwendig, statusNotbetreuung);
     }
+
+    @GetMapping("/notfall/notbetreuung")
+    public ResponseEntity<?> statusAbstimmungNotbetreuung(@ModelAttribute("sessionUser") User user) {
+        if (!user.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nur Admins dürfen die Abstimmung abschließen.");
+        }
+
+        if (user.getKind().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin hat kein Kind.");
+        }
+
+        StatusNotfallbetreuungDTO status = new StatusNotfallbetreuungDTO(user.getKind().get(0).getKitaGruppe().isAbstimmungAbgeschlossen());
+
+        return ResponseEntity.ok().body(status);
+    }
+
+    @PostMapping("/notfall/notbetreuung")
+    public ResponseEntity<?> statusAbstimmungNotbetreuungÄndern(@ModelAttribute("sessionUser") User user) {
+        if (!user.isAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nur Admins dürfen die Abstimmung abschließen.");
+        }
+
+        KitaGruppe kitaGruppe = user.getKind().stream()
+                .findFirst()
+                .map(Kind::getKitaGruppe)
+                .orElse(null);
+
+        if (kitaGruppe == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin hat kein Kind in einer KitaGruppe.");
+        }
+
+        kitaGruppe.setAbstimmungAbgeschlossen(true);
+        kitaGruppeRepository.save(kitaGruppe);
+
+        StatusNotfallbetreuungDTO status = new StatusNotfallbetreuungDTO(kitaGruppe.isAbstimmungAbgeschlossen());
+
+        return ResponseEntity.ok().body(status);
+    }
+
 
 
 

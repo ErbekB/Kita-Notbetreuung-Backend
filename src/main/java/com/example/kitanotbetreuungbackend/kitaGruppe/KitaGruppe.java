@@ -27,6 +27,7 @@ public class KitaGruppe {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "verlauf_id")
     private List<Verlauf> verläufe = new ArrayList<>();
+    private boolean abstimmungAbgeschlossen = false;
 
 
     public KitaGruppe() {
@@ -75,6 +76,14 @@ public class KitaGruppe {
 
     public void setAdmin(User admin) {
         this.admin = admin;
+    }
+
+    public boolean isAbstimmungAbgeschlossen() {
+        return abstimmungAbgeschlossen;
+    }
+
+    public void setAbstimmungAbgeschlossen(boolean abstimmungAbgeschlossen) {
+        this.abstimmungAbgeschlossen = abstimmungAbgeschlossen;
     }
 
     public List<Verlauf> getVerläufe() {
