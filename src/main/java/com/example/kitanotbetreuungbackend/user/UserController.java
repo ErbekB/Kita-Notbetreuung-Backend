@@ -24,61 +24,60 @@ import java.util.Optional;
 @CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 public class UserController {
 
-    private KitaRepository kitaRepository;
-    private UserRepository userRepository;
-    private KitaGruppeRepository kitaGruppeRepository;
-    private SessionRepository sessionRepository;
+    private final KitaRepository kitaRepository;
+    private final UserRepository userRepository;
+    private final KitaGruppeRepository kitaGruppeRepository;
 
     @Autowired
-    public UserController(KitaRepository kitaRepository, UserRepository userRepository, KitaGruppeRepository kitaGruppeRepository, SessionRepository sessionRepository) {
+    public UserController(KitaRepository kitaRepository, UserRepository userRepository, KitaGruppeRepository kitaGruppeRepository) {
         this.kitaRepository = kitaRepository;
         this.userRepository = userRepository;
         this.kitaGruppeRepository = kitaGruppeRepository;
-        this.sessionRepository = sessionRepository;
     }
 
     @GetMapping("/user")
-    public UserDTO user(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
-        User sessionUser = sessionUserOptional
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
-        return new UserDTO(sessionUser.getName(), sessionUser.isAdmin());
+    public ResponseEntity<UserDTO> user(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = getUserFromSession(sessionUserOptional);
+        UserDTO userDTO = new UserDTO(sessionUser.getName(), sessionUser.isAdmin());
+        return ResponseEntity.ok(userDTO);
     }
 
-
     @GetMapping("/index")
-    public IndexDTO hauptseite(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
-        User sessionUser = sessionUserOptional
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
+    public ResponseEntity<IndexDTO> hauptseite(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = getUserFromSession(sessionUserOptional);
 
         boolean admin = sessionUser.isAdmin();
         boolean notbetreuung = sessionUser.getKita().isNotbetreuung();
-        List<Kind> kinderListe = new ArrayList<>();
+        List<Kind> kinderListe;
         String kitaName = sessionUser.getKita().getName();
-        String kitaGruppeName = "";
+        String kitaGruppeName;
 
+        if (!sessionUser.getKind().isEmpty()) {
+            Kind kind = sessionUser.getKind().get(0);
+            KitaGruppe kitaGruppe = kind.getKitaGruppe();
 
-        if (!sessionUser.getKind().isEmpty() && sessionUser.getKind().get(0).getKitaGruppe() != null) {
-            kitaGruppeName = sessionUser.getKind().get(0).getKitaGruppe().getName();
-            kinderListe = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
+            kitaGruppeName = kitaGruppe != null ? kitaGruppe.getName() : sessionUser.getKita().getKitaGruppen().get(0).getName();
+            kinderListe = kitaGruppe != null ? kitaGruppe.getKinder() : new ArrayList<>();
         } else {
             kitaGruppeName = sessionUser.getKita().getKitaGruppen().get(0).getName();
+            kinderListe = new ArrayList<>();
         }
 
-        return new IndexDTO(admin, notbetreuung, kinderListe, kitaName, kitaGruppeName);
+        IndexDTO indexDTO = new IndexDTO(admin, notbetreuung, kinderListe, kitaName, kitaGruppeName);
+        return ResponseEntity.ok(indexDTO);
     }
 
 
     @PostMapping("/index")
     public ResponseEntity<?> statusNotbetreuung(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
-        User sessionUser = sessionUserOptional
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
+        User sessionUser = getUserFromSession(sessionUserOptional);
+        checkIfUserIsAdmin(sessionUser);
 
-        if (sessionUser.isAdmin()) {
-            sessionUser.getKita().setNotbetreuung(!sessionUser.getKita().isNotbetreuung());
-            userRepository.save(sessionUser);
-            return ResponseEntity.ok("Die Notbetreuung wurde umgeschaltet");
-        }
-        return ResponseEntity.badRequest().body("Nur Admins können die Notbetreuung an oder ausschalten");
+        Kita sessionUsersKita = sessionUser.getKita();
+        sessionUsersKita.setNotbetreuung(!sessionUsersKita.isNotbetreuung());
+        kitaRepository.save(sessionUsersKita);
+
+        return ResponseEntity.ok("Die Notbetreuung wurde umgeschaltet");
     }
 
 
@@ -144,33 +143,55 @@ public class UserController {
 
         return ResponseEntity.ok().body(newUser);
     }
+
     @DeleteMapping("/userloeschen")
-    public User userLoeschen(@ModelAttribute("sessionUser")Optional<User> sessionUser) {
-        User user = sessionUser
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
+    public ResponseEntity<?> userLoeschen(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User user = getUserFromSession(sessionUserOptional);
 
-        long test = user.getId();
-
-        System.out.println(test);
-       userRepository.delete(user);
-        return null;
+        userRepository.delete(user);
+        return ResponseEntity.noContent().build();  // Rückgabe von 204 No Content für erfolgreiche Löschung
     }
 
     @PostMapping("/abc")
-    public User namenAendern(@RequestBody UserNamenAendernDTO userName, @ModelAttribute("sessionUser") Optional<User> user1){
-            User user = user1
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
-            user.setName(userName.getUsername());
+    public ResponseEntity<?> namenAendern(@RequestBody UserNamenAendernDTO userName, @ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User user = getUserFromSession(sessionUserOptional);
+
+        String neuerName = userName.getUsername();
+        if (neuerName == null || neuerName.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Der neue Name darf nicht leer sein.");
+        }
+
+        user.setName(neuerName);
         userRepository.save(user);
-        return null;
+        return ResponseEntity.ok("Benutzername erfolgreich geändert.");
     }
 
+
     @PostMapping("/passwortAendern")
-    public User passwortAendern(@RequestBody UserPasswortAendernDTO userPasswort, @ModelAttribute("sessionUser") Optional<User> sessionUser){
-        User user = sessionUser
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Benutzer nicht gefunden"));
-        user.setPasswort(userPasswort.getPasswort());
+    public ResponseEntity<?> passwortAendern(@RequestBody UserPasswortAendernDTO userPasswort, @ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User user = getUserFromSession(sessionUserOptional);
+
+        String neuesPasswort = userPasswort.getPasswort();
+        if (neuesPasswort == null || neuesPasswort.length() < 5) {
+            return ResponseEntity.badRequest().body("Das Passwort muss mindestens 5 Zeichen lang sein.");
+        }
+
+        user.setPasswort(neuesPasswort);
+
         userRepository.save(user);
-        return null;
+        return ResponseEntity.ok("Passwort erfolgreich geändert.");
+    }
+
+
+
+    private void checkIfUserIsAdmin(User user) {
+        if (!user.isAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nur Admins dürfen diese Aktion ausführen.");
+        }
+    }
+
+    private User getUserFromSession(Optional<User> sessionUserOptional) {
+        return sessionUserOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
     }
 }

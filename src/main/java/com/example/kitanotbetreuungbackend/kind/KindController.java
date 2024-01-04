@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 public class KindController {
-    private KindRepository kindRepository;
-    private KitaGruppeRepository kitaGruppeRepository;
+    private final KindRepository kindRepository;
+    private final KitaGruppeRepository kitaGruppeRepository;
 
 
     @Autowired
