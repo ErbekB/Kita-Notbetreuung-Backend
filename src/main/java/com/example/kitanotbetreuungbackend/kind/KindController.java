@@ -52,8 +52,9 @@ public class KindController {
         boolean teilnahme = user.getKind().get(0).isTeilnahmeNotbetreuung();
         boolean notbetreuungNichtNotwendig = user.getKind().get(0).isNotbetreuungNichtNotwendig();
         boolean statusNotbetreuung = user.getKita().isNotbetreuung();
+        boolean isAdmin = user.isAdmin();
 
-        return new KitaGruppeDTO(kinderDTOs, teilnahme, user.getId(), notbetreuungNichtNotwendig, statusNotbetreuung);
+        return new KitaGruppeDTO(kinderDTOs, teilnahme, user.getId(), notbetreuungNichtNotwendig, statusNotbetreuung, isAdmin);
     }
 
     @GetMapping("/notfall/notbetreuung")
