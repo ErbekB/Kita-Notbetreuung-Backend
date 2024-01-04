@@ -17,10 +17,16 @@ public class Verlauf {
     private List<Kind> kinder;
 
     public Verlauf() {
+
     }
 
     public Verlauf(List<Kind> kinder) {
         this.datum = LocalDate.now();
+        this.kinder = kinder;
+    }
+
+    public Verlauf(List<Kind> kinder, LocalDate datum) {
+        this.datum = datum;
         this.kinder = kinder;
     }
 
