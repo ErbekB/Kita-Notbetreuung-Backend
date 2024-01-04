@@ -156,7 +156,7 @@ public class DataLoader implements ApplicationRunner {
         kind13.setCounter(5);
         kindRepository.save(kind13);
 
-        kitaGruppe.setAdmin(admin);
+        kitaGruppe.setAdmin(eltern7);
         kitaGruppeRepository.save(kitaGruppe);
 
         //Historie wird erstellt
