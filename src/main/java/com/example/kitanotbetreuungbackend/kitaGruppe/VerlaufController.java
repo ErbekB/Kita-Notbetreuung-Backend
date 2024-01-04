@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,16 +43,20 @@ public class VerlaufController {
         User user = getUserFromSession(sessionUserOptional);
 
         if (!user.isAdmin()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nur Admins können diese Funktion nutzen.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nur Admins können diese Funktion nutzen.");
         }
 
-        if (user.getKind().isEmpty() || user.getKind().get(0).getKitaGruppe() == null) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Admin benötigt Kind in einer KitaGruppe.");
+        if (user.getKind().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Admin benötigt Kind.");
         }
 
-        List<Kind> teilnehmend = user.getKind().get(0).getKitaGruppe().getKinder().stream()
-                .filter(Kind::isTeilnahmeNotbetreuung)
-                .collect(Collectors.toList());
+        List<Kind> teilnehmend = new ArrayList<>();
+        List<Kind> kinder = user.getKind().get(0).getKitaGruppe().getKinder();
+        for (Kind kind : kinder ) {
+            if (kind.isTeilnahmeNotbetreuung()){
+                teilnehmend.add(kind);
+            }
+        }
 
         Verlauf neuerVerlauf = new Verlauf(teilnehmend);
         KitaGruppe kitaGruppe = user.getKind().get(0).getKitaGruppe();
