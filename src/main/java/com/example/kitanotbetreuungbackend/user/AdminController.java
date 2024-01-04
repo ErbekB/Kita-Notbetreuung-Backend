@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 @CrossOrigin(originPatterns = "*", allowCredentials = "true", allowedHeaders = "*")
 public class AdminController {
 
-    private KindRepository kindRepository;
-    private UserRepository userRepository;
-    private KitaGruppeRepository kitaGruppeRepository;
+    private final KindRepository kindRepository;
+    private final UserRepository userRepository;
+    private final KitaGruppeRepository kitaGruppeRepository;
 
     @Autowired
     public AdminController(KindRepository kindRepository, UserRepository userRepository, KitaGruppeRepository kitaGruppeRepository) {
