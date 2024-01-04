@@ -13,7 +13,7 @@ public class Verlauf {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate datum;
-    @OneToMany
+    @ManyToMany
     private List<Kind> kinder;
 
     public Verlauf() {
