@@ -78,9 +78,13 @@ public class DataLoader implements ApplicationRunner {
         User eltern4 = new User(new ArrayList<>(), "Julian", kita, "julian");
         userRepository.save(eltern4);
 
-        Kind kind4 = new Kind("Emil", "Soeparwarta", eltern4, kitaGruppe);
+        Kind kind4 = new Kind("Emil", "Soeparwata", eltern4, kitaGruppe);
         kind4.setCounter(0);
         kindRepository.save(kind4);
+
+        Kind kind24 = new Kind("Milo", "Soeparwata", eltern4, kitaGruppe);
+        kind24.setCounter(3);
+        kindRepository.save(kind24);
 
         User eltern5 = new User(new ArrayList<>(), "Sarah", kita, "sarah");
         userRepository.save(eltern5);
@@ -94,20 +98,24 @@ public class DataLoader implements ApplicationRunner {
 
         Kind kind6 = new Kind("Luca", "Richter", eltern6, kitaGruppe);
         kind6.setCounter(1);
+        kind6.setTeilnahmeNotbetreuung(true);
         kindRepository.save(kind6);
 
         User eltern7 = new User(new ArrayList<>(), "Bahadir", kita, "bahadir");
+        eltern7.setAdmin(true);
         userRepository.save(eltern7);
 
         Kind kind7 = new Kind("Otto", "Erbek", eltern7, kitaGruppe);
-        kind7.setCounter(1);
+        kind7.setCounter(2);
+        kind7.setTeilnahmeNotbetreuung(true);
         kindRepository.save(kind7);
 
         User eltern8 = new User(new ArrayList<>(), "Julia", kita, "julia");
         userRepository.save(eltern8);
 
         Kind kind8 = new Kind("Hannah", "Schuster", eltern8, kitaGruppe);
-        kind8.setCounter(2);
+        kind8.setCounter(3);
+        kind8.setTeilnahmeNotbetreuung(true);
         kindRepository.save(kind8);
 
         User eltern9 = new User(new ArrayList<>(), "Michaela", kita, "michaela");
@@ -128,24 +136,24 @@ public class DataLoader implements ApplicationRunner {
         userRepository.save(eltern11);
 
         Kind kind11 = new Kind("Elias", "Schulz", eltern11, kitaGruppe);
-        kind11.setCounter(3);
+        kind11.setCounter(4);
         kindRepository.save(kind11);
 
         User eltern12 = new User(new ArrayList<>(), "Fatih", kita, "fatih");
         userRepository.save(eltern12);
 
         Kind kind12 = new Kind("Elif", "Baskurt", eltern12, kitaGruppe);
-        kind12.setCounter(0);
+        kind12.setCounter(1);
+        kind12.setTeilnahmeNotbetreuung(true);
         kindRepository.save(kind12);
 
 
         // Optional: Create admin user
         User admin = new User(new ArrayList<>(), "Fajul", kita, "fajul");
-        admin.setAdmin(true);
         userRepository.save(admin);
 
-        Kind kind13 = new Kind("Agatha", "Bahrian", admin, kitaGruppe);
-        kind13.setCounter(1);
+        Kind kind13 = new Kind("Emel", "Agatha", admin, kitaGruppe);
+        kind13.setCounter(5);
         kindRepository.save(kind13);
 
         kitaGruppe.setAdmin(admin);

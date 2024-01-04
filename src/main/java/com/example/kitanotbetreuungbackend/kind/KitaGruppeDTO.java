@@ -8,13 +8,15 @@ public class KitaGruppeDTO {
     private long userId;
     private boolean notbetreuungNichtNotwendig;
     private boolean statusNotbetreuung;
+    private boolean isAdmin;
 
-    public KitaGruppeDTO(List<KindDTO> kinder, boolean teilnahmeNotbetreuung, long userId, boolean notbetreuungNichtNotwendig, boolean statusNotbetreuung) {
+    public KitaGruppeDTO(List<KindDTO> kinder, boolean teilnahmeNotbetreuung, long userId, boolean notbetreuungNichtNotwendig, boolean statusNotbetreuung, boolean isAdmin) {
         this.kinder = kinder;
         this.teilnahmeNotbetreuung = teilnahmeNotbetreuung;
         this.userId = userId;
         this.notbetreuungNichtNotwendig = notbetreuungNichtNotwendig;
         this.statusNotbetreuung = statusNotbetreuung;
+        this.isAdmin = isAdmin;
     }
 
     // Getter und Setter
@@ -56,5 +58,13 @@ public class KitaGruppeDTO {
 
     public void setStatusNotbetreuung(boolean statusNotbetreuung) {
         this.statusNotbetreuung = statusNotbetreuung;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }
