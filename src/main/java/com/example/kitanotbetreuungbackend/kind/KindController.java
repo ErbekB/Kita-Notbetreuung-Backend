@@ -1,11 +1,9 @@
 package com.example.kitanotbetreuungbackend.kind;
 
-import com.example.kitanotbetreuungbackend.kita.KitaRepository;
 import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppe;
 import com.example.kitanotbetreuungbackend.kitaGruppe.KitaGruppeRepository;
 import com.example.kitanotbetreuungbackend.kitaGruppe.StatusNotfallbetreuungDTO;
 import com.example.kitanotbetreuungbackend.user.User;
-import com.example.kitanotbetreuungbackend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,25 +20,23 @@ import java.util.stream.Collectors;
 public class KindController {
     private KindRepository kindRepository;
     private KitaGruppeRepository kitaGruppeRepository;
-    private UserRepository userRepository;
+
 
     @Autowired
-    public KindController(KindRepository kindRepository, KitaGruppeRepository kitaGruppeRepository, UserRepository userRepository) {
+    public KindController(KindRepository kindRepository, KitaGruppeRepository kitaGruppeRepository) {
         this.kindRepository = kindRepository;
         this.kitaGruppeRepository = kitaGruppeRepository;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/notfall")
     public KitaGruppeDTO uebersicht(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
-        User sessionUser = sessionUserOptional
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
+        User user = getUserFromSession(sessionUserOptional);
 
-        if (sessionUser.getKind().isEmpty()) {
+        if (user.getKind().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Admin muss sein Kind hinzufügen");
         }
 
-        List<Kind> kinder = sessionUser.getKind().get(0).getKitaGruppe().getKinder();
+        List<Kind> kinder = user.getKind().get(0).getKitaGruppe().getKinder();
         List<KindDTO> kinderDTOs = kinder.stream()
                 .filter(kind -> !kind.isNotbetreuungNichtNotwendig())
                 .map(kind -> new KindDTO(
@@ -53,67 +49,57 @@ public class KindController {
                         kind.isNotbetreuungNichtNotwendig()))
                 .collect(Collectors.toList());
 
-        boolean teilnahme = sessionUser.getKind().get(0).isTeilnahmeNotbetreuung();
-        boolean notbetreuungNichtNotwendig = sessionUser.getKind().get(0).isNotbetreuungNichtNotwendig();
-        boolean statusNotbetreuung = sessionUser.getKita().isNotbetreuung();
+        boolean teilnahme = user.getKind().get(0).isTeilnahmeNotbetreuung();
+        boolean notbetreuungNichtNotwendig = user.getKind().get(0).isNotbetreuungNichtNotwendig();
+        boolean statusNotbetreuung = user.getKita().isNotbetreuung();
 
-        return new KitaGruppeDTO(kinderDTOs, teilnahme, sessionUser.getId(), notbetreuungNichtNotwendig, statusNotbetreuung);
+        return new KitaGruppeDTO(kinderDTOs, teilnahme, user.getId(), notbetreuungNichtNotwendig, statusNotbetreuung);
     }
 
     @GetMapping("/notfall/notbetreuung")
-    public ResponseEntity<?> statusAbstimmungNotbetreuung(@ModelAttribute("sessionUser") User user) {
-        if (!user.isAdmin()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nur Admins dürfen die Abstimmung abschließen.");
-        }
+    public ResponseEntity<StatusNotfallbetreuungDTO> statusAbstimmungNotbetreuung(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User user = getUserFromSession(sessionUserOptional);
+        checkIfUserIsAdmin(user);
 
         if (user.getKind().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin hat kein Kind.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin hat kein Kind.");
         }
 
-        StatusNotfallbetreuungDTO status = new StatusNotfallbetreuungDTO(user.getKind().get(0).getKitaGruppe().isAbstimmungAbgeschlossen());
+        KitaGruppe kitaGruppe = user.getKind().get(0).getKitaGruppe();
 
-        return ResponseEntity.ok().body(status);
+        StatusNotfallbetreuungDTO status = new StatusNotfallbetreuungDTO(kitaGruppe.isAbstimmungAbgeschlossen());
+        return ResponseEntity.ok(status);
+
     }
 
     @PostMapping("/notfall/notbetreuung")
-    public ResponseEntity<?> statusAbstimmungNotbetreuungÄndern(@ModelAttribute("sessionUser") User user) {
-        if (!user.isAdmin()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nur Admins dürfen die Abstimmung abschließen.");
+    public ResponseEntity<StatusNotfallbetreuungDTO> statusAbstimmungNotbetreuungÄndern(@ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User user = getUserFromSession(sessionUserOptional);
+        checkIfUserIsAdmin(user);
+
+        if (user.getKind().isEmpty() || user.getKind().get(0).getKitaGruppe() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin hat kein Kind in einer KitaGruppe.");
         }
 
-        KitaGruppe kitaGruppe = user.getKind().stream()
-                .findFirst()
-                .map(Kind::getKitaGruppe)
-                .orElse(null);
-
-        if (kitaGruppe == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin hat kein Kind in einer KitaGruppe.");
-        }
-
+        KitaGruppe kitaGruppe = user.getKind().get(0).getKitaGruppe();
         kitaGruppe.setAbstimmungAbgeschlossen(true);
         kitaGruppeRepository.save(kitaGruppe);
 
         StatusNotfallbetreuungDTO status = new StatusNotfallbetreuungDTO(kitaGruppe.isAbstimmungAbgeschlossen());
-
-        return ResponseEntity.ok().body(status);
+        return ResponseEntity.ok(status);
     }
 
 
 
+    @PostMapping("/notfall/{kindId}")
+    public ResponseEntity<?> bearbeitung(@PathVariable long kindId, @ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = getUserFromSession(sessionUserOptional);
 
-    @PostMapping("/notfall/{kindId}") //Todo return data to check the counter
-    public ResponseEntity<?> bearbeitung(@PathVariable long kindId, @ModelAttribute("sessionUser") User sessionUser) {
-        Optional<Kind> kindOptional = kindRepository.findById(kindId);
+        Kind kind = kindRepository.findById(kindId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kind nicht gefunden"));
 
-        if (kindOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Kind nicht gefunden");
-        }
-
-        Kind kind = kindOptional.get();
-
-        // Überprüfen, ob das Kind dem eingeloggten User gehört
         if (!kind.getUser().getId().equals(sessionUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nicht berechtigt, die Teilnahme für dieses Kind zu ändern");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nicht berechtigt, die Teilnahme für dieses Kind zu ändern");
         }
 
         // Aktualisierung der Teilnahme und des Counters
@@ -124,18 +110,15 @@ public class KindController {
     }
 
     @PostMapping("/notfall/aendern/{kindId}")
-    public ResponseEntity<?> aendern(@PathVariable long kindId, @ModelAttribute("sessionUser") User sessionUser) {
-        Optional<Kind> kindOptional = kindRepository.findById(kindId);
+    public ResponseEntity<?> aendern(@PathVariable long kindId, @ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = getUserFromSession(sessionUserOptional);
 
-        if (kindOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Kind nicht gefunden");
-        }
-
-        Kind kind = kindOptional.get();
+        Kind kind = kindRepository.findById(kindId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Kind nicht gefunden"));
 
         // Überprüfen, ob das Kind dem eingeloggten User gehört
         if (!kind.getUser().getId().equals(sessionUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nicht berechtigt, die Teilnahme für dieses Kind zu ändern");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nicht berechtigt, die Teilnahme für dieses Kind zu ändern");
         }
 
         // Aktualisierung der Teilnahme und des Counters
@@ -153,18 +136,14 @@ public class KindController {
 
     //Teilnahme zurückziehen
     @PostMapping("/notfall/teilnahme/{kindId}")
-    public ResponseEntity<?> keineTeilnahme(@PathVariable long kindId, @ModelAttribute("sessionUser") User sessionUser) {
-        Optional<Kind> kindOptional = kindRepository.findById(kindId);
+    public ResponseEntity<?> keineTeilnahme(@PathVariable long kindId, @ModelAttribute("sessionUser") Optional<User> sessionUserOptional) {
+        User sessionUser = getUserFromSession(sessionUserOptional);
 
-        if (kindOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kind nicht gefunden.");
-        }
+        Kind kind = kindRepository.findById(kindId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kind nicht gefunden."));
 
-        Kind kind = kindOptional.get();
-
-        // Überprüfen, ob das Kind dem eingeloggten User gehört
         if (!kind.getUser().getId().equals(sessionUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Nicht berechtigt, diese Änderung für dieses Kind durchzuführen.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nicht berechtigt, diese Änderung für dieses Kind durchzuführen.");
         }
 
         kind.setNotbetreuungNichtNotwendig(true);
@@ -174,14 +153,31 @@ public class KindController {
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
-    public void resetProperties(){
+    public void resetProperties() {
         List<Kind> kinder = kindRepository.findAll();
-        for (Kind kind : kinder) {
+        kinder.forEach(kind -> {
             kind.setTeilnahmeNotbetreuung(false);
             kind.setNotbetreuungNichtNotwendig(false);
-            kindRepository.save(kind);
+        });
+        kindRepository.saveAll(kinder);
+
+        List<KitaGruppe> kitaGruppen = kitaGruppeRepository.findAll();
+        for (KitaGruppe kitaGruppe : kitaGruppen) {
+            kitaGruppe.setAbstimmungAbgeschlossen(false);
         }
+        kitaGruppeRepository.saveAll(kitaGruppen);
+    }
+
+    private void checkIfUserIsAdmin(User user) {
+        if (!user.isAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nur Admins dürfen diese Aktion ausführen.");
         }
     }
+
+    private User getUserFromSession(Optional<User> sessionUserOptional) {
+        return sessionUserOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No valid login"));
+    }
+}
 
 
