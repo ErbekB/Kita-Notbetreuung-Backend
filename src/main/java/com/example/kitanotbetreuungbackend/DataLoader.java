@@ -58,7 +58,7 @@ public class DataLoader implements ApplicationRunner {
         userRepository.save(eltern);
 
         Kind kind = new Kind("Emma", "Müller", eltern, kitaGruppe);
-        kind.setCounter(4);
+        kind.setCounter(5);
         kindRepository.save(kind);
 
         User eltern2 = new User(new ArrayList<>(), "Jan", kita, "jan");
@@ -79,7 +79,7 @@ public class DataLoader implements ApplicationRunner {
         userRepository.save(eltern4);
 
         Kind kind4 = new Kind("Emil", "Soeparwata", eltern4, kitaGruppe);
-        kind4.setCounter(0);
+        kind4.setCounter(1);
         kindRepository.save(kind4);
 
         Kind kind24 = new Kind("Milo", "Soeparwata", eltern4, kitaGruppe);
@@ -97,7 +97,7 @@ public class DataLoader implements ApplicationRunner {
         userRepository.save(eltern6);
 
         Kind kind6 = new Kind("Luca", "Richter", eltern6, kitaGruppe);
-        kind6.setCounter(1);
+        kind6.setCounter(2);
         kind6.setTeilnahmeNotbetreuung(true);
         kindRepository.save(kind6);
 
@@ -106,7 +106,7 @@ public class DataLoader implements ApplicationRunner {
         userRepository.save(eltern7);
 
         Kind kind7 = new Kind("Otto", "Erbek", eltern7, kitaGruppe);
-        kind7.setCounter(2);
+        kind7.setCounter(1);
         kind7.setTeilnahmeNotbetreuung(true);
         kindRepository.save(kind7);
 
@@ -129,7 +129,7 @@ public class DataLoader implements ApplicationRunner {
         userRepository.save(eltern10);
 
         Kind kind10 = new Kind("Lina", "Meier", eltern10, kitaGruppe);
-        kind10.setCounter(5);
+        kind10.setCounter(6);
         kindRepository.save(kind10);
 
         User eltern11 = new User(new ArrayList<>(), "Stefanie", kita, "stefanie");
@@ -153,7 +153,7 @@ public class DataLoader implements ApplicationRunner {
         userRepository.save(admin);
 
         Kind kind13 = new Kind("Emel", "Agatha", admin, kitaGruppe);
-        kind13.setCounter(5);
+        kind13.setCounter(3);
         kindRepository.save(kind13);
 
         kitaGruppe.setAdmin(eltern7);
@@ -163,8 +163,8 @@ public class DataLoader implements ApplicationRunner {
         List<Kind> kindListe = new ArrayList<>();
         kindListe.add(kind);
         kindListe.add(kind3);
-        kindListe.add(kind7);
-        kindListe.add(kind2);
+        kindListe.add(kind10);
+        kindListe.add(kind24);
         kindListe.add(kind8);
 
         Verlauf verlauf = new Verlauf(kindListe, LocalDate.of(2024,1,5));
@@ -174,9 +174,9 @@ public class DataLoader implements ApplicationRunner {
 
         List<Kind> kindListe2 = new ArrayList<>();
         kindListe2.add(kind10);
-        kindListe2.add(kind9);
+        kindListe2.add(kind24);
         kindListe2.add(kind3);
-        kindListe2.add(kind6);
+        kindListe2.add(kind13);
         kindListe2.add(kind);
 
         Verlauf verlauf2 = new Verlauf(kindListe2, LocalDate.of(2024,1,3));
@@ -186,10 +186,10 @@ public class DataLoader implements ApplicationRunner {
 
         List<Kind> kindListe3 = new ArrayList<>();
         kindListe3.add(kind);
-        kindListe3.add(kind8);
+        kindListe3.add(kind10);
         kindListe3.add(kind11);
         kindListe3.add(kind2);
-        kindListe3.add(kind9);
+        kindListe3.add(kind4);
 
         Verlauf verlauf3 = new Verlauf(kindListe3, LocalDate.of(2024,1,2));
         kitaGruppe.addVerlauf(verlauf3);
@@ -200,7 +200,7 @@ public class DataLoader implements ApplicationRunner {
         kindListe4.add(kind);
         kindListe4.add(kind5);
         kindListe4.add(kind3);
-        kindListe4.add(kind9);
+        kindListe4.add(kind13);
         kindListe4.add(kind10);
 
         Verlauf verlauf4 = new Verlauf(kindListe4, LocalDate.of(2023,12,21));
@@ -212,8 +212,8 @@ public class DataLoader implements ApplicationRunner {
         kindListe5.add(kind2);
         kindListe5.add(kind11);
         kindListe5.add(kind5);
-        kindListe5.add(kind9);
         kindListe5.add(kind10);
+        kindListe5.add(kind8);
 
         Verlauf verlauf5 = new Verlauf(kindListe5, LocalDate.of(2023,12,20));
         kitaGruppe.addVerlauf(verlauf5);
@@ -223,8 +223,9 @@ public class DataLoader implements ApplicationRunner {
         kindListe6.add(kind13);
         kindListe6.add(kind5);
         kindListe6.add(kind3);
-        kindListe6.add(kind9);
-        kindListe6.add(kind10);
+        kindListe6.add(kind);
+        kindListe6.add(kind24);
+
 
         Verlauf verlauf6 = new Verlauf(kindListe6, LocalDate.of(2023, 12, 19));
         kitaGruppe.addVerlauf(verlauf6);
@@ -234,7 +235,7 @@ public class DataLoader implements ApplicationRunner {
         kindListe7.add(kind2);
         kindListe7.add(kind11);
         kindListe7.add(kind5);
-        kindListe7.add(kind9);
+        kindListe7.add(kind6);
         kindListe7.add(kind10);
 
         Verlauf verlauf7 = new Verlauf(kindListe7, LocalDate.of(2023, 12, 11));
