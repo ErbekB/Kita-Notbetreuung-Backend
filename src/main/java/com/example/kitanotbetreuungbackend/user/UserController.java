@@ -85,9 +85,9 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody RegistrierenRequestDTO registrieren) {
         String name = registrieren.getName();
         String passwort = registrieren.getPasswort();
-        String kitaName = registrieren.getKita().toLowerCase();
+        String kitaName = registrieren.getKita();
         int postleitzahl = Integer.parseInt(registrieren.getPostleitzahl());
-        String kitaGruppeName = registrieren.getKitaGruppe().toLowerCase();
+        String kitaGruppeName = registrieren.getKitaGruppe();
 
         // Validierungen
         if (name.length() < 3) {
